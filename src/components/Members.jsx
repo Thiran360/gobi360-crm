@@ -4,6 +4,7 @@ import {
   Phone, Mail, Calendar, Store, Wrench, Truck, User, Hash,
   AlertCircle, BookUser, X, PhoneCall, ChevronRight, Loader2
 } from 'lucide-react';
+import { fetchRoleMembers, fetchUserContacts } from '../services/api';
 
 /* ─── Role Config ─── */
 const ROLE_OPTIONS = [
@@ -12,21 +13,6 @@ const ROLE_OPTIONS = [
   { value: 'shopkeeper', label: 'Shopkeeper', icon: Store, color: '#d97706', bg: 'rgba(217,119,6,0.10)', gradient: 'linear-gradient(135deg,#d97706,#b45309)' },
   { value: 'deliveryman', label: 'Delivery Man', icon: Truck, color: '#7c3aed', bg: 'rgba(124,58,237,0.10)', gradient: 'linear-gradient(135deg,#7c3aed,#6d28d9)' },
 ];
-
-/* ─── API Helpers ─── */
-async function fetchRoleMembers(role) {
-  const res = await fetch(`/api/gobi360/users/role/${role}/`, { cache: 'no-store' });
-  if (res.status === 400 || res.status === 404) return { success: true, count: 0, data: [] };
-  if (!res.ok) throw new Error(`Server error: ${res.status}`);
-  return res.json();
-}
-
-async function fetchUserContacts(mobile) {
-  const res = await fetch(`/api/gobi360/contacts/${mobile}/`, { cache: 'no-store' });
-  if (res.status === 400 || res.status === 404) return { success: true, count: 0, contacts: [] };
-  if (!res.ok) throw new Error(`Server error: ${res.status}`);
-  return res.json();
-}
 
 /* ─── Contacts Drawer ─── */
 function ContactsDrawer({ member, onClose }) {

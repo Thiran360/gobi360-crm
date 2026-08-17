@@ -4,6 +4,7 @@ import {
   AlertCircle, User, RefreshCw, Users,
   Store, Wrench, Truck, ChevronRight, Loader2, Mail
 } from 'lucide-react';
+import { fetchRoleMembers, fetchUserContacts } from '../services/api';
 
 /* ─── Role Config ─── */
 const ROLES = [
@@ -15,18 +16,12 @@ const ROLES = [
 
 /* ─── API Helpers ─── */
 async function loadUsers(role) {
-  const res = await fetch(`/api/gobi360/users/role/${role}/`, { cache: 'no-store' });
-  if (res.status === 400 || res.status === 404) return [];
-  if (!res.ok) throw new Error(`Server error ${res.status}`);
-  const json = await res.json();
+  const json = await fetchRoleMembers(role);
   return Array.isArray(json.data) ? json.data : Array.isArray(json) ? json : [];
 }
 
 async function loadContacts(mobile) {
-  const res = await fetch(`/api/gobi360/contacts/${mobile}/`, { cache: 'no-store' });
-  if (res.status === 400 || res.status === 404) return [];
-  if (!res.ok) throw new Error(`Server error ${res.status}`);
-  const json = await res.json();
+  const json = await fetchUserContacts(mobile);
   if (json.data && Array.isArray(json.data.contacts)) {
     return json.data.contacts;
   }

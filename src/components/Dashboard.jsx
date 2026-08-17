@@ -25,6 +25,7 @@ import CallList from './CallList';
 import CallDetailDrawer from './CallDetailDrawer';
 import AddCallModal from './AddCallModal';
 import EcomOrders from './EcomOrders';
+import { fetchCallRequests, updateCallRequest } from '../services/api';
 
 const INITIAL_CALLS = [
   {
@@ -99,27 +100,7 @@ export default function Dashboard({ user, onLogout }) {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch('/api/gobi360/call-request-list/', { cache: 'no-store' });
-      if (response.status === 400 || response.status === 404) {
-        setCalls([]);
-        return;
-      }
-      if (!response.ok) {
-        throw new Error(`API returned status ${response.status}`);
-      }
-      const data = await response.json();
-
-      let callList = [];
-      if (Array.isArray(data)) {
-        callList = data;
-      } else if (data && Array.isArray(data.results)) {
-        callList = data.results;
-      } else if (data && Array.isArray(data.data)) {
-        callList = data.data;
-      } else {
-        const arrayProp = Object.values(data).find(val => Array.isArray(val));
-        callList = arrayProp || [];
-      }
+      const callList = await fetchCallRequests();
 
       const formatted = callList.map(c => ({
         ...c,
@@ -228,18 +209,7 @@ export default function Dashboard({ user, onLogout }) {
           approved: false
         };
         console.log(`Sending disapproval PUT payload for Call #${id}:`, payload);
-
-        const response = await fetch(`/api/gobi360/call-request-crm-update/${id}/`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-          throw new Error(`PUT request failed with status ${response.status}`);
-        }
+        await updateCallRequest(id, payload);
         console.log(`Disapproval payload successfully persisted for Call #${id}`);
       } catch (err) {
         console.error(`Failed to persist disapproval payload for Call #${id}:`, err);
@@ -279,18 +249,7 @@ export default function Dashboard({ user, onLogout }) {
         approved: true
       };
       console.log(`Sending approval PUT payload for Call #${id}:`, payload);
-
-      const response = await fetch(`/api/gobi360/call-request-crm-update/${id}/`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) {
-        throw new Error(`PUT request failed with status ${response.status}`);
-      }
+      await updateCallRequest(id, payload);
       console.log(`Approval payload successfully persisted for Call #${id}`);
     } catch (err) {
       console.error(`Failed to persist approval payload for Call #${id}:`, err);
