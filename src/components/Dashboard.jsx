@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Shield,
   LayoutDashboard,
@@ -82,6 +83,19 @@ const INITIAL_CALLS = [
 ];
 
 export default function Dashboard({ user, onLogout }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const getActiveMenuFromPath = (pathname) => {
+    if (pathname.startsWith('/calls')) return 'calls';
+    if (pathname.startsWith('/members')) return 'members';
+    if (pathname.startsWith('/contacts') || pathname.startsWith('/user-contacts')) return 'user-contacts';
+    if (pathname.startsWith('/ecom-orders') || pathname.startsWith('/eco-orders')) return 'eco-orders';
+    return 'dashboard';
+  };
+
+  const activeMenu = getActiveMenuFromPath(location.pathname);
+
   const [calls, setCalls] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -89,12 +103,7 @@ export default function Dashboard({ user, onLogout }) {
   const [activeFilter, setActiveFilter] = useState('all'); // all, answered, missed
   const [selectedCall, setSelectedCall] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [activeMenu, setActiveMenu] = useState(() => localStorage.getItem('gobi360_active_menu') || 'dashboard');
   const [approvingCallId, setApprovingCallId] = useState(null);
-
-  useEffect(() => {
-    localStorage.setItem('gobi360_active_menu', activeMenu);
-  }, [activeMenu]);
 
   const fetchCalls = async () => {
     try {
@@ -322,7 +331,7 @@ export default function Dashboard({ user, onLogout }) {
         <nav className="sidebar-menu">
           <div
             className={`menu-item ${activeMenu === 'dashboard' ? 'active' : ''}`}
-            onClick={() => setActiveMenu('dashboard')}
+            onClick={() => navigate('/dashboard')}
           >
             <LayoutDashboard size={18} />
             <span>Dashboard</span>
@@ -330,7 +339,7 @@ export default function Dashboard({ user, onLogout }) {
 
           <div
             className={`menu-item ${activeMenu === 'calls' ? 'active' : ''}`}
-            onClick={() => setActiveMenu('calls')}
+            onClick={() => navigate('/calls')}
           >
             <Phone size={18} />
             <span>Call Management</span>
@@ -338,7 +347,7 @@ export default function Dashboard({ user, onLogout }) {
 
           <div
             className={`menu-item ${activeMenu === 'members' ? 'active' : ''}`}
-            onClick={() => setActiveMenu('members')}
+            onClick={() => navigate('/members')}
           >
             <Users size={18} />
             <span>Members</span>
@@ -346,7 +355,7 @@ export default function Dashboard({ user, onLogout }) {
 
           <div
             className={`menu-item ${activeMenu === 'user-contacts' ? 'active' : ''}`}
-            onClick={() => setActiveMenu('user-contacts')}
+            onClick={() => navigate('/contacts')}
           >
             <BookUser size={18} />
             <span>User Contact</span>
@@ -354,7 +363,7 @@ export default function Dashboard({ user, onLogout }) {
 
           <div
             className={`menu-item ${activeMenu === 'eco-orders' ? 'active' : ''}`}
-            onClick={() => setActiveMenu('eco-orders')}
+            onClick={() => navigate('/ecom-orders')}
           >
             <ShoppingCart size={18} />
             <span>Ecom Orders</span>
