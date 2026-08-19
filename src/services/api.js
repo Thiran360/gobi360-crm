@@ -111,13 +111,18 @@ export async function fetchShops() {
 
 /**
  * Order Callback Data API
- * Requests /order-callback-data/1/?shop_id=X
+ * Requests /order-callback-data/{shopId}/?shop_id={shopId}
  */
-export async function fetchOrderCallbackData(shopId, orderId = 1) {
-  const sId = typeof shopId === 'object' ? shopId.id : shopId;
-  const targetOrderId = orderId || 1;
+export async function fetchOrderCallbackData(shopId, orderId) {
+  const sId = typeof shopId === 'object' ? shopId?.id : shopId;
+  const targetId = orderId || sId || 1;
 
-  const res = await apiFetch(`/order-callback-data/${targetOrderId}/?shop_id=${sId}`);
+  const res = await apiFetch(`/order-callback-data/${targetId}/`);
+
+  if (res.status === 400 || res.status === 404) {
+    const json = await res.json().catch(() => null);
+    return json || { success: false, message: 'Order not found', data: [] };
+  }
 
   if (!res.ok) {
     throw new Error(`Server error: ${res.status}`);
