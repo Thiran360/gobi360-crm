@@ -2,7 +2,7 @@
  * Centralized API Service for gobi360 CRM
  */
 
-export const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/gobi360';
+export const BASE_URL = 'https://api.codingboss.in/gobi360';
 
 /**
  * Reusable fetch wrapper with BASE_URL and required ngrok / JSON headers.
@@ -42,7 +42,7 @@ export async function fetchCallRequests() {
     throw new Error(`API returned status ${response.status}`);
   }
   const data = await response.json();
-  
+
   let callList = [];
   if (Array.isArray(data)) {
     callList = data;
@@ -111,19 +111,13 @@ export async function fetchShops() {
 
 /**
  * Order Callback Data API
- * Requests /order-callback-data/1/ (or order_id) passing shop_id in header
+ * Requests /order-callback-data/1/?shop_id=X
  */
 export async function fetchOrderCallbackData(shopId, orderId = 1) {
   const sId = typeof shopId === 'object' ? shopId.id : shopId;
   const targetOrderId = orderId || 1;
 
-  const res = await apiFetch(`/order-callback-data/${targetOrderId}/`, {
-    method: 'GET',
-    headers: {
-      'shop_id': String(sId),
-      'shop-id': String(sId),
-    }
-  });
+  const res = await apiFetch(`/order-callback-data/${targetOrderId}/?shop_id=${sId}`);
 
   if (!res.ok) {
     throw new Error(`Server error: ${res.status}`);
