@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Shield,
   LayoutDashboard,
@@ -25,6 +26,7 @@ import CallList from './CallList';
 import CallDetailDrawer from './CallDetailDrawer';
 import AddCallModal from './AddCallModal';
 import EcomOrders from './EcomOrders';
+import { fetchCallRequests, updateCallRequest } from '../services/api';
 
 const INITIAL_CALLS = [
   {
@@ -81,6 +83,19 @@ const INITIAL_CALLS = [
 ];
 
 export default function Dashboard({ user, onLogout }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const getActiveMenuFromPath = (pathname) => {
+    if (pathname.startsWith('/calls')) return 'calls';
+    if (pathname.startsWith('/members')) return 'members';
+    if (pathname.startsWith('/contacts') || pathname.startsWith('/user-contacts')) return 'user-contacts';
+    if (pathname.startsWith('/ecom-orders') || pathname.startsWith('/eco-orders')) return 'eco-orders';
+    return 'dashboard';
+  };
+
+  const activeMenu = getActiveMenuFromPath(location.pathname);
+
   const [calls, setCalls] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -88,38 +103,13 @@ export default function Dashboard({ user, onLogout }) {
   const [activeFilter, setActiveFilter] = useState('all'); // all, answered, missed
   const [selectedCall, setSelectedCall] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [activeMenu, setActiveMenu] = useState(() => localStorage.getItem('gobi360_active_menu') || 'dashboard');
   const [approvingCallId, setApprovingCallId] = useState(null);
-
-  useEffect(() => {
-    localStorage.setItem('gobi360_active_menu', activeMenu);
-  }, [activeMenu]);
 
   const fetchCalls = async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch('/api/gobi360/call-request-list/', { cache: 'no-store' });
-      if (response.status === 400 || response.status === 404) {
-        setCalls([]);
-        return;
-      }
-      if (!response.ok) {
-        throw new Error(`API returned status ${response.status}`);
-      }
-      const data = await response.json();
-
-      let callList = [];
-      if (Array.isArray(data)) {
-        callList = data;
-      } else if (data && Array.isArray(data.results)) {
-        callList = data.results;
-      } else if (data && Array.isArray(data.data)) {
-        callList = data.data;
-      } else {
-        const arrayProp = Object.values(data).find(val => Array.isArray(val));
-        callList = arrayProp || [];
-      }
+      const callList = await fetchCallRequests();
 
       const formatted = callList.map(c => ({
         ...c,
@@ -228,18 +218,7 @@ export default function Dashboard({ user, onLogout }) {
           approved: false
         };
         console.log(`Sending disapproval PUT payload for Call #${id}:`, payload);
-
-        const response = await fetch(`/api/gobi360/call-request-crm-update/${id}/`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-          throw new Error(`PUT request failed with status ${response.status}`);
-        }
+        await updateCallRequest(id, payload);
         console.log(`Disapproval payload successfully persisted for Call #${id}`);
       } catch (err) {
         console.error(`Failed to persist disapproval payload for Call #${id}:`, err);
@@ -279,18 +258,7 @@ export default function Dashboard({ user, onLogout }) {
         approved: true
       };
       console.log(`Sending approval PUT payload for Call #${id}:`, payload);
-
-      const response = await fetch(`/api/gobi360/call-request-crm-update/${id}/`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) {
-        throw new Error(`PUT request failed with status ${response.status}`);
-      }
+      await updateCallRequest(id, payload);
       console.log(`Approval payload successfully persisted for Call #${id}`);
     } catch (err) {
       console.error(`Failed to persist approval payload for Call #${id}:`, err);
@@ -363,7 +331,7 @@ export default function Dashboard({ user, onLogout }) {
         <nav className="sidebar-menu">
           <div
             className={`menu-item ${activeMenu === 'dashboard' ? 'active' : ''}`}
-            onClick={() => setActiveMenu('dashboard')}
+            onClick={() => navigate('/dashboard')}
           >
             <LayoutDashboard size={18} />
             <span>Dashboard</span>
@@ -371,7 +339,7 @@ export default function Dashboard({ user, onLogout }) {
 
           <div
             className={`menu-item ${activeMenu === 'calls' ? 'active' : ''}`}
-            onClick={() => setActiveMenu('calls')}
+            onClick={() => navigate('/calls')}
           >
             <Phone size={18} />
             <span>Call Management</span>
@@ -379,7 +347,7 @@ export default function Dashboard({ user, onLogout }) {
 
           <div
             className={`menu-item ${activeMenu === 'members' ? 'active' : ''}`}
-            onClick={() => setActiveMenu('members')}
+            onClick={() => navigate('/members')}
           >
             <Users size={18} />
             <span>Members</span>
@@ -387,7 +355,7 @@ export default function Dashboard({ user, onLogout }) {
 
           <div
             className={`menu-item ${activeMenu === 'user-contacts' ? 'active' : ''}`}
-            onClick={() => setActiveMenu('user-contacts')}
+            onClick={() => navigate('/contacts')}
           >
             <BookUser size={18} />
             <span>User Contact</span>
@@ -395,7 +363,7 @@ export default function Dashboard({ user, onLogout }) {
 
           <div
             className={`menu-item ${activeMenu === 'eco-orders' ? 'active' : ''}`}
-            onClick={() => setActiveMenu('eco-orders')}
+            onClick={() => navigate('/ecom-orders')}
           >
             <ShoppingCart size={18} />
             <span>Ecom Orders</span>

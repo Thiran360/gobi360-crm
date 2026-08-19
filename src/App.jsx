@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 
@@ -46,12 +47,62 @@ export default function App() {
   }
 
   return (
-    <>
-      {user ? (
-        <Dashboard user={user} onLogout={handleLogout} />
-      ) : (
-        <Login onLogin={handleLogin} />
-      )}
-    </>
+    <Routes>
+      <Route
+        path="/login"
+        element={
+          user ? <Navigate to="/dashboard" replace /> : <Login onLogin={handleLogin} />
+        }
+      />
+      <Route
+        path="/dashboard"
+        element={
+          user ? <Dashboard user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />
+        }
+      />
+      <Route
+        path="/calls"
+        element={
+          user ? <Dashboard user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />
+        }
+      />
+      <Route
+        path="/members"
+        element={
+          user ? <Dashboard user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />
+        }
+      />
+      <Route
+        path="/contacts"
+        element={
+          user ? <Dashboard user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />
+        }
+      />
+      <Route
+        path="/user-contacts"
+        element={
+          user ? <Dashboard user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />
+        }
+      />
+      <Route
+        path="/ecom-orders"
+        element={
+          user ? <Dashboard user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />
+        }
+      />
+      <Route
+        path="/eco-orders"
+        element={
+          user ? <Dashboard user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />
+        }
+      />
+      <Route
+        path="*"
+        element={
+          user ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />
+        }
+      />
+    </Routes>
   );
 }
+
