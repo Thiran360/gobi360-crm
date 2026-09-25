@@ -15,14 +15,14 @@ const ROLE_OPTIONS = [
 
 /* ─── API Helpers ─── */
 async function fetchRoleMembers(role) {
-  const res = await fetch(`/api/gobi360/users/role/${role}/`, { cache: 'no-store' });
+  const res = await fetch(`https://api.codingboss.in/gobi360/users/role/${role}/`, { cache: 'no-store' });
   if (res.status === 400 || res.status === 404) return { success: true, count: 0, data: [] };
   if (!res.ok) throw new Error(`Server error: ${res.status}`);
   return res.json();
 }
 
 async function fetchUserContacts(mobile) {
-  const res = await fetch(`/api/gobi360/contacts/${mobile}/`, { cache: 'no-store' });
+  const res = await fetch(`https://api.codingboss.in/gobi360/contacts/${mobile}/`, { cache: 'no-store' });
   if (res.status === 400 || res.status === 404) return { success: true, count: 0, contacts: [] };
   if (!res.ok) throw new Error(`Server error: ${res.status}`);
   return res.json();

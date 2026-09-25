@@ -4,7 +4,7 @@ import { Eye, Trash2, CheckCircle2, ShieldAlert } from 'lucide-react';
 export default function CallList({ calls, onSelect, onDelete, onApprove }) {
   
   const getStatusBadge = (status) => {
-    switch (status.toLowerCase()) {
+    switch ((status || '').toLowerCase()) {
       case 'answered':
         return (
           <span className="badge badge-completed" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '0.7rem', padding: '3px 8px' }}>
@@ -80,7 +80,7 @@ export default function CallList({ calls, onSelect, onDelete, onApprove }) {
                 <td>
                   <div className="contact-cell">
                     <div className="contact-avatar">
-                      {call.customer_name.split(' ').map(n => n[0]).join('')}
+                      {(call.customer_name || '?').split(' ').map(n => n[0]).join('')}
                     </div>
                     <div className="contact-details">
                       <span className="contact-name">{call.customer_name}</span>

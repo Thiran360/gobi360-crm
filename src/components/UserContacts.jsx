@@ -15,7 +15,7 @@ const ROLES = [
 
 /* ─── API Helpers ─── */
 async function loadUsers(role) {
-  const res = await fetch(`/api/gobi360/users/role/${role}/`, { cache: 'no-store' });
+  const res = await fetch(`https://api.codingboss.in/gobi360/users/role/${role}/`, { cache: 'no-store' });
   if (res.status === 400 || res.status === 404) return [];
   if (!res.ok) throw new Error(`Server error ${res.status}`);
   const json = await res.json();
@@ -23,7 +23,7 @@ async function loadUsers(role) {
 }
 
 async function loadContacts(mobile) {
-  const res = await fetch(`/api/gobi360/contacts/${mobile}/`, { cache: 'no-store' });
+  const res = await fetch(`https://api.codingboss.in/gobi360/contacts/${mobile}/`, { cache: 'no-store' });
   if (res.status === 400 || res.status === 404) return [];
   if (!res.ok) throw new Error(`Server error ${res.status}`);
   const json = await res.json();

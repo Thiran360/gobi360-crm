@@ -7,7 +7,7 @@ export default function CallDetailDrawer({ call, onClose }) {
   };
 
   const getStatusBadge = (status) => {
-    switch (status.toLowerCase()) {
+    switch ((status || '').toLowerCase()) {
       case 'answered':
         return (
           <span className="badge badge-completed" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '0.7rem', padding: '4px 10px' }}>

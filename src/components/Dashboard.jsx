@@ -99,7 +99,7 @@ export default function Dashboard({ user, onLogout }) {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch('/api/gobi360/call-request-list/', { cache: 'no-store' });
+      const response = await fetch('https://api.codingboss.in/gobi360/call-request-list/', { cache: 'no-store' });
       if (response.status === 400 || response.status === 404) {
         setCalls([]);
         return;
@@ -171,12 +171,13 @@ export default function Dashboard({ user, onLogout }) {
 
   // Filtered list
   const filteredCalls = calls.filter(call => {
+    const q = searchQuery ? searchQuery.toLowerCase() : "";
     const matchesSearch =
-      call.customer_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      call.customer_mobile.includes(searchQuery) ||
-      (call.customer_email && call.customer_email.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      call.expert_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      call.expert_user_name.toLowerCase().includes(searchQuery.toLowerCase());
+      (call.customer_name || '').toLowerCase().includes(q) ||
+      (call.customer_mobile || '').includes(searchQuery) ||
+      (call.customer_email || '').toLowerCase().includes(q) ||
+      (call.expert_name || '').toLowerCase().includes(q) ||
+      (call.expert_user_name || '').toLowerCase().includes(q);
 
     if (!matchesSearch) return false;
 
@@ -229,7 +230,7 @@ export default function Dashboard({ user, onLogout }) {
         };
         console.log(`Sending disapproval PUT payload for Call #${id}:`, payload);
 
-        const response = await fetch(`/api/gobi360/call-request-crm-update/${id}/`, {
+        const response = await fetch(`https://api.codingboss.in/gobi360/call-request-crm-update/${id}/`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
@@ -280,7 +281,7 @@ export default function Dashboard({ user, onLogout }) {
       };
       console.log(`Sending approval PUT payload for Call #${id}:`, payload);
 
-      const response = await fetch(`/api/gobi360/call-request-crm-update/${id}/`, {
+      const response = await fetch(`https://api.codingboss.in/gobi360/call-request-crm-update/${id}/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -769,7 +770,7 @@ export default function Dashboard({ user, onLogout }) {
                       >
                         <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
                           <div className="contact-avatar" style={{ width: '32px', height: '32px', fontSize: '0.75rem' }}>
-                            {call.customer_name.split(' ').map(n => n[0]).join('')}
+                            {(call.customer_name || '?').split(' ').map(n => n[0]).join('')}
                           </div>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                             <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>{call.customer_name}</span>
@@ -823,7 +824,7 @@ export default function Dashboard({ user, onLogout }) {
         }}>
           <div className="calling-avatar-box">
             <div className="calling-avatar">
-              {liveCall.customer_name.split(' ').map(n => n[0]).join('')}
+              {(liveCall.customer_name || '?').split(' ').map(n => n[0]).join('')}
             </div>
             <div className="calling-pulse"></div>
             {liveCall.status === 'ringing' && <div className="calling-pulse-2"></div>}
