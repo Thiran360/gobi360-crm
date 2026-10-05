@@ -4,7 +4,7 @@ import {
   AlertCircle, User, RefreshCw, Users,
   Store, Wrench, Truck, ChevronRight, Loader2, Mail
 } from 'lucide-react';
-
+import { getApiUrl, DEFAULT_HEADERS } from '../config/api';
 /* ─── Role Config ─── */
 const ROLES = [
   { value: 'customer', label: 'Customer', icon: User, color: '#2563eb', gradient: 'linear-gradient(135deg,#2563eb,#1d4ed8)', bg: 'rgba(37,99,235,0.10)' },
@@ -15,7 +15,10 @@ const ROLES = [
 
 /* ─── API Helpers ─── */
 async function loadUsers(role) {
-  const res = await fetch(`https://api.codingboss.in/gobi360/users/role/${role}/`, { cache: 'no-store' });
+  const res = await fetch(getApiUrl(`users/role/${role}/`), {
+    cache: 'no-store',
+    headers: DEFAULT_HEADERS
+  });
   if (res.status === 400 || res.status === 404) return [];
   if (!res.ok) throw new Error(`Server error ${res.status}`);
   const json = await res.json();
@@ -23,7 +26,10 @@ async function loadUsers(role) {
 }
 
 async function loadContacts(mobile) {
-  const res = await fetch(`https://api.codingboss.in/gobi360/contacts/${mobile}/`, { cache: 'no-store' });
+  const res = await fetch(getApiUrl(`contacts/${mobile}/`), {
+    cache: 'no-store',
+    headers: DEFAULT_HEADERS
+  });
   if (res.status === 400 || res.status === 404) return [];
   if (!res.ok) throw new Error(`Server error ${res.status}`);
   const json = await res.json();

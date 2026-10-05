@@ -17,14 +17,31 @@ import {
   X,
   Users,
   BookUser,
-  ShoppingCart
+  ShoppingCart,
+  Package,
+  Wrench,
+  Store,
+  Sliders,
+  Tags,
+  Layers
 } from 'lucide-react';
+import { getApiUrl, DEFAULT_HEADERS } from '../config/api';
 import Members from './Members';
 import UserContacts from './UserContacts';
 import CallList from './CallList';
 import CallDetailDrawer from './CallDetailDrawer';
 import AddCallModal from './AddCallModal';
 import EcomOrders from './EcomOrders';
+import Products from './Products';
+import Expert from './Expert';
+import Services from './Services';
+import Shops from './Shops';
+import Slider from './Slider';
+import Orders from './Orders';
+import Categories from './Categories';
+import ProductCategory from './ProductCategory';
+import ProductVariation from './ProductVariation';
+import ExpertCategory from './ExpertCategory';
 
 const INITIAL_CALLS = [
   {
@@ -99,7 +116,10 @@ export default function Dashboard({ user, onLogout }) {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch('https://api.codingboss.in/gobi360/call-request-list/', { cache: 'no-store' });
+      const response = await fetch(getApiUrl('call-request-list/'), {
+        cache: 'no-store',
+        headers: DEFAULT_HEADERS
+      });
       if (response.status === 400 || response.status === 404) {
         setCalls([]);
         return;
@@ -230,10 +250,11 @@ export default function Dashboard({ user, onLogout }) {
         };
         console.log(`Sending disapproval PUT payload for Call #${id}:`, payload);
 
-        const response = await fetch(`https://api.codingboss.in/gobi360/call-request-crm-update/${id}/`, {
+        const response = await fetch(getApiUrl(`call-request-crm-update/${id}/`), {
           method: 'PUT',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            ...DEFAULT_HEADERS
           },
           body: JSON.stringify(payload)
         });
@@ -281,10 +302,11 @@ export default function Dashboard({ user, onLogout }) {
       };
       console.log(`Sending approval PUT payload for Call #${id}:`, payload);
 
-      const response = await fetch(`https://api.codingboss.in/gobi360/call-request-crm-update/${id}/`, {
+      const response = await fetch(getApiUrl(`call-request-crm-update/${id}/`), {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          ...DEFAULT_HEADERS
         },
         body: JSON.stringify(payload)
       });
@@ -395,11 +417,83 @@ export default function Dashboard({ user, onLogout }) {
           </div>
 
           <div
-            className={`menu-item ${activeMenu === 'eco-orders' ? 'active' : ''}`}
-            onClick={() => setActiveMenu('eco-orders')}
+            className={`menu-item ${activeMenu === 'orders' || activeMenu === 'eco-orders' ? 'active' : ''}`}
+            onClick={() => setActiveMenu('orders')}
           >
             <ShoppingCart size={18} />
-            <span>Ecom Orders</span>
+            <span>Orders</span>
+          </div>
+
+          <div
+            className={`menu-item ${activeMenu === 'products' ? 'active' : ''}`}
+            onClick={() => setActiveMenu('products')}
+          >
+            <Package size={18} />
+            <span>Products</span>
+          </div>
+
+          <div
+            className={`menu-item ${activeMenu === 'expert' ? 'active' : ''}`}
+            onClick={() => setActiveMenu('expert')}
+          >
+            <UserCheck size={18} />
+            <span>Expert</span>
+          </div>
+
+          <div
+            className={`menu-item ${activeMenu === 'services' ? 'active' : ''}`}
+            onClick={() => setActiveMenu('services')}
+          >
+            <Wrench size={18} />
+            <span>Services</span>
+          </div>
+
+          <div
+            className={`menu-item ${activeMenu === 'shops' ? 'active' : ''}`}
+            onClick={() => setActiveMenu('shops')}
+          >
+            <Store size={18} />
+            <span>Shops</span>
+          </div>
+
+          <div
+            className={`menu-item ${activeMenu === 'slider' ? 'active' : ''}`}
+            onClick={() => setActiveMenu('slider')}
+          >
+            <Sliders size={18} />
+            <span>Slider</span>
+          </div>
+
+          <div
+            className={`menu-item ${activeMenu === 'categorys' ? 'active' : ''}`}
+            onClick={() => setActiveMenu('categorys')}
+          >
+            <Tags size={18} />
+            <span>Categorys</span>
+          </div>
+
+          <div
+            className={`menu-item ${activeMenu === 'products-category' ? 'active' : ''}`}
+            onClick={() => setActiveMenu('products-category')}
+          >
+            <Layers size={18} />
+            <span>Products Category</span>
+          </div>
+
+          <div
+            className={`menu-item ${activeMenu === 'product-variation' ? 'active' : ''}`}
+            onClick={() => setActiveMenu('product-variation')}
+          >
+            <Sliders size={18} />
+            <span>Product Variation</span>
+          </div>
+
+          <div
+            className={`menu-item ${activeMenu === 'expert-category' ? 'active' : ''}`}
+            onClick={() => setActiveMenu('expert-category')}
+          >
+            <UserCheck size={18} />
+            <span>Expert Category</span>
           </div>
         </nav>
 
@@ -425,11 +519,20 @@ export default function Dashboard({ user, onLogout }) {
         <header className="dashboard-header animate-fade-in">
           <div className="header-title">
             <h1>
-              {activeMenu === 'calls' ? 'Call Registry'
-                : activeMenu === 'members' ? 'Members'
-                  : activeMenu === 'user-contacts' ? 'User Contact'
-                    : activeMenu === 'eco-orders' ? 'Ecom Orders'
-                      : 'Dashboard'}
+              {activeMenu === 'expert-category' ? 'Expert Category'
+                : activeMenu === 'product-variation' ? 'Product Variation'
+                  : activeMenu === 'products-category' ? 'Products Category'
+                    : activeMenu === 'categorys' ? 'Categorys'
+                      : activeMenu === 'orders' || activeMenu === 'eco-orders' ? 'Orders'
+                        : activeMenu === 'slider' ? 'Slider'
+                          : activeMenu === 'shops' ? 'Shops'
+                            : activeMenu === 'services' ? 'Services'
+                              : activeMenu === 'expert' ? 'Expert'
+                                : activeMenu === 'calls' ? 'Call Registry'
+                                  : activeMenu === 'members' ? 'Members'
+                                    : activeMenu === 'user-contacts' ? 'User Contact'
+                                      : activeMenu === 'products' ? 'Products'
+                                        : 'Dashboard'}
             </h1>
           </div>
 
@@ -440,10 +543,19 @@ export default function Dashboard({ user, onLogout }) {
                 type="text"
                 className="search-input"
                 placeholder={
-                  activeMenu === 'user-contacts' ? 'Search users by name or mobile...'
-                    : activeMenu === 'members' ? 'Search members...'
-                      : activeMenu === 'eco-orders' ? 'Search ecom orders...'
-                        : 'Search customer, expert...'
+                  activeMenu === 'expert-category' ? 'Search expert category by name, image url...'
+                    : activeMenu === 'product-variation' ? 'Search product variation by option, value...'
+                      : activeMenu === 'products-category' ? 'Search product category by name, slug...'
+                        : activeMenu === 'categorys' ? 'Search category by name, slug...'
+                          : activeMenu === 'orders' || activeMenu === 'eco-orders' ? 'Search order by customer, mobile, items...'
+                            : activeMenu === 'slider' ? 'Search slider by title, subtitle, URL...'
+                              : activeMenu === 'shops' ? 'Search shops by name, owner, mobile...'
+                                : activeMenu === 'services' ? 'Search services by name, category...'
+                                  : activeMenu === 'expert' ? 'Search experts by name, mobile, specialization...'
+                                    : activeMenu === 'user-contacts' ? 'Search users by name or mobile...'
+                                      : activeMenu === 'members' ? 'Search members...'
+                                        : activeMenu === 'products' ? 'Search products by name, SKU or category...'
+                                          : 'Search customer, expert...'
                 }
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -471,13 +583,31 @@ export default function Dashboard({ user, onLogout }) {
 
 
 
-        {/* Members Page */}
-        {activeMenu === 'members' ? (
+        {/* Pages */}
+        {activeMenu === 'expert-category' ? (
+          <ExpertCategory globalSearch={searchQuery} />
+        ) : activeMenu === 'product-variation' ? (
+          <ProductVariation globalSearch={searchQuery} />
+        ) : activeMenu === 'products-category' ? (
+          <ProductCategory globalSearch={searchQuery} />
+        ) : activeMenu === 'categorys' ? (
+          <Categories globalSearch={searchQuery} />
+        ) : activeMenu === 'slider' ? (
+          <Slider globalSearch={searchQuery} />
+        ) : activeMenu === 'shops' ? (
+          <Shops globalSearch={searchQuery} />
+        ) : activeMenu === 'services' ? (
+          <Services globalSearch={searchQuery} />
+        ) : activeMenu === 'expert' ? (
+          <Expert globalSearch={searchQuery} />
+        ) : activeMenu === 'members' ? (
           <Members />
         ) : activeMenu === 'user-contacts' ? (
           <UserContacts globalSearch={searchQuery} />
-        ) : activeMenu === 'eco-orders' ? (
-          <EcomOrders />
+        ) : activeMenu === 'orders' || activeMenu === 'eco-orders' ? (
+          <Orders globalSearch={searchQuery} />
+        ) : activeMenu === 'products' ? (
+          <Products globalSearch={searchQuery} />
         ) : activeMenu === 'calls' ? (
           <section className="call-section-card glass">
             <div className="call-section-header">
